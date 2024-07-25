@@ -1,6 +1,8 @@
 # LlamaSynth
 It is to generate synthetic text data, making Llama agents to chat each other
 
+**🚧 It's under the construction 🚧**
+
 ```python
     from agent import LlamaAgent
 
