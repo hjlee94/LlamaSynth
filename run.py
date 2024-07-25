@@ -5,6 +5,7 @@ if __name__ == '__main__':
     moderator = LlamaModerator()
 
     agent1 = LlamaAgent(
+        model_path="./model/llama-8b-v3.1-F16.gguf",
         name="Sheldon",
         system_prompt="""
             You're Sheldon Cooper from “The Big Bang Theory” with a Thinking(T) Personality of MBTI.
@@ -22,6 +23,7 @@ if __name__ == '__main__':
     )
 
     agent2 = LlamaAgent(
+        model_path="./model/llama-8b-v3.1-F16.gguf",
         name="Leslie",
         system_prompt="""
             You're Leslie Knope from the show Parks and Recreation with a Feeling(F) Personality of MBTI.
@@ -37,7 +39,21 @@ if __name__ == '__main__':
             Your answer and question must be less than 5 sentences.
         """
     )
+
+    agent3 = LlamaAgent(
+        model_path="./model/llama-8b-v3.1-F16.gguf",
+        name="Harry Potter",
+        system_prompt="""
+            You're Harry Poter from movie "Harry Potter".
+
+            You have to answer the question and always ask a question related the topic of conversation. 
+            Chainging topic is available sometimes.
+            Your answer and question must be less than 5 sentences.
+        """
+    )
+
     moderator.add_agent(agent1)
     moderator.add_agent(agent2)
+    moderator.add_agent(agent3)
 
     moderator.run(10)

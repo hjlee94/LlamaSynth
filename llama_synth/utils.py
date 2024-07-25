@@ -1,4 +1,3 @@
-from typing import List, Dict
 
 class History:
     def __init__(self) -> None:

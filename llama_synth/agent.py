@@ -1,12 +1,12 @@
 from llama_cpp import Llama
-from utils import History, PromptGenerator
+from .utils import History, PromptGenerator
 
 class LlamaAgent:
-    def __init__(self, name, system_prompt="", max_tokens=256) -> None:
+    def __init__(self, model_path, name, system_prompt="", max_tokens=256) -> None:
         self.name = name
         
         self._llm = Llama(
-            model_path="./model/llama-8b-v3.1-F16.gguf",
+            model_path=model_path,
             verbose=False,
             n_ctx=2048
             # n_gpu_layers=-1, # Uncomment to use GPU acceleration
@@ -27,6 +27,7 @@ class LlamaAgent:
         choices = output['choices']
 
         if len(choices) > 1:
+            #! it is required to compare scores?
             print(f"multiple!!!", choices)
 
         answer = choices[0]['text'].strip()
