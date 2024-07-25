@@ -1,5 +1,6 @@
 
 from llama_synth import LlamaModerator, LlamaSpeaker
+
 if __name__ == '__main__':
 
     moderator = LlamaModerator(log_path="./chat.tsv")
