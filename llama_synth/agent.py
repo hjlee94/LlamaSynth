@@ -1,7 +1,17 @@
 from llama_cpp import Llama
-from .utils import History, PromptGenerator
+from .utils import History, PromptManager
 
-class LlamaAgent:
+import yaml
+
+class LlamaSpeaker:
+
+    @classmethod
+    def from_card(cls, path):
+        with open(path, 'r') as fd:
+            data = yaml.load(fd, Loader=yaml.CLoader)
+        
+        return cls(**data)
+
     def __init__(self, model_path, name, system_prompt="", max_tokens=256) -> None:
         self.name = name
         
@@ -12,7 +22,7 @@ class LlamaAgent:
             # n_gpu_layers=-1, # Uncomment to use GPU acceleration
             # seed=1337, # Uncomment to set a specific seed
         )
-        self._prompt = PromptGenerator(
+        self._prompt = PromptManager(
             system_prompt=system_prompt
         )
 
@@ -20,7 +30,10 @@ class LlamaAgent:
 
         self._max_tokens = max_tokens
 
-    def _generate(self, q):
+    def clear_history(self):
+        self._history.clear()
+
+    def generate(self, q):
         text = self._prompt.get_prompt(question=q, chat_history=self._history)
         output = self._llm(text, max_tokens=self._max_tokens)
 

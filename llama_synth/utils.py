@@ -1,21 +1,28 @@
 
 class History:
-    def __init__(self) -> None:
+    def __init__(self, max_history=50) -> None:
         self._history = []
+        self._max_history = max_history
 
     def append_chat(self, question, answer):
         self._history.append(
             dict(q=question, a=answer)
         )
 
+        self._history = self._history[self._max_history:]
+
     def get_chat_history(self, last=0):
         if last > 0:
             return self._history[-last:]
         
         return self._history
+    
+    def clear(self):
+        self._history = []
 
-class PromptGenerator:
+class PromptManager:
     def __init__(self, system_prompt:str) -> None:
+        #<|begin_of_text|>
         self._system_prompt = f"<|start_header_id|>system<|end_header_id|>"
         self._system_prompt+= f"{system_prompt}<|eot_id|>"
 
