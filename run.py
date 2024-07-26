@@ -15,4 +15,4 @@ if __name__ == '__main__':
     moderator.add_agent(agent2)
     # moderator.add_agent(agent3)
 
-    moderator.role_play(n=5, n_toss=6)
+    moderator.simulate_play(n=5, n_toss=6)
