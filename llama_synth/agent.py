@@ -35,7 +35,7 @@ class LlamaSpeaker:
 
     def generate(self, q):
         text = self._prompt.get_prompt(question=q, chat_history=self._history, history_k=4)
-        output = self._llm(text, max_tokens=self._max_tokens, temperature=0.9, top_p=0.95, frequency_penalty=0.1)
+        output = self._llm(text, max_tokens=self._max_tokens)#, temperature=0.9, top_p=0.95, frequency_penalty=0.1)
 
         choices = output['choices']
 
