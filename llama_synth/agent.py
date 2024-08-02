@@ -12,7 +12,7 @@ class LlamaSpeaker:
         
         return cls(**data)
 
-    def __init__(self, model_path, name, system_prompt="", max_tokens=256) -> None:
+    def __init__(self, model_path, name, system_prompt="", max_tokens=256, temperature=0.8, top_p=0.95, frequency_penalty=0.0) -> None:
         self.name = name
         
         self._llm = Llama(
@@ -26,6 +26,10 @@ class LlamaSpeaker:
             system_prompt=system_prompt
         )
 
+        self._temperature = temperature
+        self._top_p = top_p
+        self._frequency_penalty = frequency_penalty
+
         self._history = History()
 
         self._max_tokens = max_tokens
@@ -35,7 +39,8 @@ class LlamaSpeaker:
 
     def generate(self, q):
         text = self._prompt.get_prompt(question=q, chat_history=self._history, history_k=4)
-        output = self._llm(text, max_tokens=self._max_tokens)#, temperature=0.9, top_p=0.95, frequency_penalty=0.1)
+        output = self._llm(text, max_tokens=self._max_tokens, 
+                           temperature=self._temperature, top_p=self._top_p, frequency_penalty=self._frequency_penalty)
 
         choices = output['choices']
 

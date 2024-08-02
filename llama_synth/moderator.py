@@ -31,16 +31,13 @@ class LlamaModerator:
         idx = random.randint(0, len(self._topic)-1)
         return self._topic[idx]
     
-    def log(self, name, sentence):
+    def log(self, *s):
         if not self._log_path:
             return
         
-        if not os.path.exists(self._log_path):
-            with open(self._log_path, 'w', encoding='utf-8') as fd:
-                fd.write(f"name\tlines")
-
+        contents = '\t'.join(s)
         with open(self._log_path, 'a', encoding='utf-8') as fd:
-            fd.write(f"\n{name}\t{sentence}")
+            fd.write(f"\n{contents}")
     
     def discuss_q(self):
         def get_q():
@@ -93,10 +90,15 @@ class LlamaModerator:
 
             inp = answer
 
+            log_msg = []
+
             for agent in self._agent_pool:
                 answer = agent.generate(inp).replace('\n', ' ')
                 print(f'[{agent.name}] >> {answer}\n')
 
-                self.log(agent.name, answer)
+                log_msg.append(agent.name)
+                log_msg.append(answer)
+            
+            self.log(log_msg)
             
             [agent.clear_history() for agent in self._agent_pool]
