@@ -99,6 +99,6 @@ class LlamaModerator:
                 log_msg.append(agent.name)
                 log_msg.append(answer)
             
-            self.log(log_msg)
+            self.log(*log_msg)
             
             [agent.clear_history() for agent in self._agent_pool]
