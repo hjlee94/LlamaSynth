@@ -1,4 +1,10 @@
-from typing import Callable
+from typing import Callable, List
+
+from .template import get_classification_template
+
+import yaml
+
+type TemplateGetter = Callable[[str], str]
 
 class History:
     def __init__(self, max_history=50) -> None:
@@ -21,46 +27,51 @@ class History:
     def clear(self):
         self._history = []
 
-class PromptManager:
-    def __init__(self, system_prompt:str, template=None) -> None:
+class Prompt:
+    def __init__(self, system_prompt:str, template:TemplateGetter=None) -> None:
         #<|begin_of_text|>
         self._system_prompt = f"<|start_header_id|>system<|end_header_id|>"
         self._system_prompt+= f"{system_prompt}<|eot_id|>"
-
+        
         self._template = template
 
-    @staticmethod
-    def get_user_prompt(question:str, template:Callable[[str], str]):
+        self.history = History()
+
+    @classmethod
+    def with_classification_template(cls, system_prompt:str, label_names:List[str]) -> "Prompt":
+        template = get_classification_template(label_names)
+        return cls(system_prompt, template)
+
+    def get_user_prompt(self, question:str) -> str:
         prompt = f"<|start_header_id|>user<|end_header_id|>"
 
-        if template:
-            question = template(question)
+        if self._template:
+            question = self._template(question)
 
         prompt += f"{question}<|eot_id|>"
         return prompt
 
-    @staticmethod
-    def get_assistant_prompt(answer:str="") -> str:
+    def get_assistant_prompt(self, answer:str="") -> str:
         prompt = f"<|start_header_id|>assistant<|end_header_id|>"
         if answer:
             prompt += f"{answer}<|eot_id|>"
 
         return prompt
 
-    def set_template(self, template:Callable[[str],str]):
+    def set_template(self, template:TemplateGetter):
         self._template = template
 
-    def get_prompt(self, question:str, chat_history:History=None, history_k=2) -> str:
+    def get_prompt(self, question:str, history_k:int=2) -> str:
         prompt = f"{self._system_prompt}"
 
-        if chat_history:
-            for h in chat_history.get_chat_history(last=history_k):
+        if history_k > 0:
+            for h in self.history.get_chat_history(last=history_k):
                 hq = h['q']; ha = h['a']
 
-                prompt += self.get_user_prompt(question=hq, template=self._template)
+                prompt += self.get_user_prompt(question=hq)
                 prompt += self.get_assistant_prompt(answer=ha)
 
-        prompt += self.get_user_prompt(question=question, template=self._template)
+        prompt += self.get_user_prompt(question=question)
         prompt += self.get_assistant_prompt()
         
         return prompt

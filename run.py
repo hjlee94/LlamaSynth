@@ -1,41 +1,81 @@
 
 from llama_synth import LlamaModerator, LlamaSpeaker
+from llama_synth.moderator import Topic
+from llama_synth.prompt import Prompt
 
-def generate_synth_data_on_interview():
 
-    moderator = LlamaModerator(log_path="./interview.tsv")
+def interview_example():
+    agent1 = LlamaSpeaker.from_card("./cards/sheldon.yaml")
+    agent2 = LlamaSpeaker.from_card("./cards/harry.yaml")
 
-    # agent1 = LlamaSpeaker.from_card("./cards/sheldon.yaml")
-    # agent2 = LlamaSpeaker.from_card("./cards/leslie.yaml")
-    # agent3 = LlamaSpeaker.from_card("./cards/harry.yaml")
-    assistant = LlamaSpeaker.from_card("./cards/assistant.yaml")
+    assistent = LlamaSpeaker(
+        name="assistant",
+        model_path="./models/llama-8b-v3.1-F16.gguf",
+        prompt=Prompt(
+            system_prompt="You are an interview assistant who generate a casual question",
+            template=None
+            )
+        )
+ 
+    topic = Topic(
+        question = "Give me a question for interview",
+        topic_list = ["Science", "Lord Voldemort"]
+        )
+    
+    print(topic.get_question_getter()())
+    
+    moderator = LlamaModerator(topic=topic, log_path="./example.tsv")
 
-    agent1 = LlamaSpeaker.from_card("./cards/guest_T.yaml")
-    agent2 = LlamaSpeaker.from_card("./cards/guest_F.yaml")
+    moderator.add_agent(agent1)
+    moderator.add_agent(agent2)
+    
+    moderator.interview(assistant=assistent, n=2)
+
+def relay_example():
+    agent1 = LlamaSpeaker.from_card("./cards/sheldon.yaml")
+    agent2 = LlamaSpeaker.from_card("./cards/harry.yaml")
+
+    topic = Topic(
+        question = "Let's start the discussion.",
+        topic_list = ["Science", "Lord Voldemort"]
+        )
+    
+    print(topic.get_question_getter()())
+    
+    moderator = LlamaModerator(topic=topic, log_path="./example.tsv")
 
     moderator.add_agent(agent1)
     moderator.add_agent(agent2)
 
-    # moderator.discuss_q(get_q=moderator.simulate_play_q, n=5, n_toss=6)
-    moderator.interview(assistant=assistant, n=1000)
+    moderator.relay(n=5, n_toss=10)
 
 def classify_label():
+    from llama_synth import LlamaSpeaker
+    from llama_synth.prompt import Prompt
+    from llama_synth.prompt.template import get_classification_template
+
+    prompt = Prompt.with_classification_template(
+        system_prompt="You are a classifier for T personality and F personality of MBTI. You reponse only a label name",
+        label_names=['T Personality', 'F Personality']
+    )
+
     agent = LlamaSpeaker(
         model_path="./models/llama-8b-v3.1-F16.gguf",
         name="classifier",
-        system_prompt="You are a classifier reponses only a label name",
+        prompt=prompt
         )
-    agent.set_classification_mode(
-        label_name=["T Personality", "F Personality"]
-    )
+    agent.set_classification_mode()
     
     # inp = "That is the world works. You should practice more"
-    inp = "You have a headache. Opening the door would be helpful."
+    # inp = "You have a headache. Opening the door would be helpful."
+    inp = "In real life, the probability of that happening is extremely low"
     # inp = "I'm sorry. You can get a first place next time"
-    # i =f"Classify the text into T(Thinking) Personality or F(Feeling) Personality in MBTI\nText:{inp}\nLabel:"
-    resp = agent.generate(inp)
+    
+    resp = agent(inp)
 
     print(resp)
 
 if __name__ == '__main__':
-    classify_label()
+    # classify_label()
+    # relay_example()
+    interview_example()

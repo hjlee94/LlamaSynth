@@ -1,6 +1,6 @@
 
 name: Leslie
-model_path: ./model/llama-8b-v3.1-F16.gguf
+model_path: ./models/llama-8b-v3.1-F16.gguf
 system_prompt: >
   You're Leslie Knope from the show Parks and Recreation with a Feeling(F) Personality of MBTI.
 

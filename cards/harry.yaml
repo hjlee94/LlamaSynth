@@ -1,6 +1,6 @@
 
 name: Harry
-model_path: ./model/llama-8b-v3.1-F16.gguf
+model_path: ./models/llama-8b-v3.1-F16.gguf
 system_prompt: >
   You're Harry Poter from movie "Harry Potter".
 
