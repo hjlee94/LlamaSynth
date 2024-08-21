@@ -5,7 +5,7 @@ def interview_example():
     from llama_synth.prompt import Prompt
 
     agent1 = LlamaSpeaker.from_card("./cards/sheldon.yaml")
-    agent2 = LlamaSpeaker.from_card("./cards/harry.yaml")
+    agent2 = LlamaSpeaker.from_card("./cards/leslie.yaml")
 
     assistent = LlamaSpeaker(
         name="assistant",
@@ -18,7 +18,7 @@ def interview_example():
  
     topic = Topic(
         question = "Give me a question for interview",
-        topic_list = ["Science", "Lord Voldemort"]
+        topic_list = None
         )
     
     print(topic.get_question_getter()())
@@ -58,8 +58,8 @@ def classify_label():
     from llama_synth.prompt.template import get_classification_template
 
     prompt = Prompt.with_classification_template(
-        system_prompt="You are a classifier for T personality and F personality of MBTI. You reponse only a label name",
-        label_names=['T Personality', 'F Personality']
+        system_prompt="You are a classifier for Review Preference (Bad or Good). You reponse only a label name",
+        label_names=['Bad', 'Good']
     )
 
     agent = LlamaSpeaker(
@@ -69,16 +69,19 @@ def classify_label():
         )
     agent.set_classification_mode()
     
-    # inp = "That is the world works. You should practice more"
-    # inp = "You have a headache. Opening the door would be helpful."
-    inp = "In real life, the probability of that happening is extremely low"
-    # inp = "I'm sorry. You can get a first place next time"
+    inp_list = [
+        "This hotel is not good for a business. The bed is the worst I'd ever seen",
+        "The room is so clean. House-keeping is the best in the world. It makes my day happy",
+        "A rat comes out in the bathroom.",
+        "The most of staffs were kind but few were very rude."
+    ]
     
-    resp = agent(inp)
-
-    print(resp)
+    for inp in inp_list:
+        resp = agent(inp)
+        print(f"[input] >> {inp}")
+        print(f"[prediction] >> {resp}")
 
 if __name__ == '__main__':
-    # classify_label()
-    relay_example()
+    classify_label()
+    # relay_example()
     # interview_example()
