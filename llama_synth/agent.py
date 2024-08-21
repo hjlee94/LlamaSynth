@@ -1,5 +1,8 @@
+from typing import List, Callable
+
 from llama_cpp import Llama
-from .utils import History, PromptManager
+from .prompt.manager import History, PromptManager
+from .prompt import template
 
 import yaml
 
@@ -12,7 +15,7 @@ class LlamaSpeaker:
         
         return cls(**data)
 
-    def __init__(self, model_path, name, system_prompt="", max_tokens=256, temperature=0.8, top_p=0.95, frequency_penalty=0.0) -> None:
+    def __init__(self, model_path, name, system_prompt="", max_tokens=256, **kwargs) -> None:
         self.name = name
         
         self._llm = Llama(
@@ -26,13 +29,24 @@ class LlamaSpeaker:
             system_prompt=system_prompt
         )
 
-        self._temperature = temperature
-        self._top_p = top_p
-        self._frequency_penalty = frequency_penalty
+        self._llm_param = {}
+        self._llm_param['temperature'] = 0.8
+        self._llm_param['top_p'] = 0.95
+        self._llm_param['frequency_penalty'] = 0.0
+        self._llm_param.update(kwargs)
 
         self._history = History()
 
         self._max_tokens = max_tokens
+
+    def set_classification_mode(self, label_name:List[str]):
+        self._llm_param['top_p'] = 1.0
+        self._llm_param['frequency_penalty'] = 0
+        self._llm_param['presence_penalty'] = 0
+
+        self._prompt.set_template(
+            template.classification_template(label_name)
+        )
 
     def clear_history(self):
         self._history.clear()
@@ -40,14 +54,9 @@ class LlamaSpeaker:
     def generate(self, q):
         text = self._prompt.get_prompt(question=q, chat_history=self._history, history_k=4)
         output = self._llm(text, max_tokens=self._max_tokens, 
-                           temperature=self._temperature, top_p=self._top_p, frequency_penalty=self._frequency_penalty)
+                           **self._llm_param)
 
         choices = output['choices']
-
-        if len(choices) > 1:
-            #! it is required to compare scores?
-            print(f"multiple!!!", choices)
-
         answer = choices[0]['text'].strip()
 
         self._history.append_chat(question=q, answer=answer)

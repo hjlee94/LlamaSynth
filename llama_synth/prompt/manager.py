@@ -1,3 +1,4 @@
+from typing import Callable
 
 class History:
     def __init__(self, max_history=50) -> None:
@@ -21,14 +22,20 @@ class History:
         self._history = []
 
 class PromptManager:
-    def __init__(self, system_prompt:str) -> None:
+    def __init__(self, system_prompt:str, template=None) -> None:
         #<|begin_of_text|>
         self._system_prompt = f"<|start_header_id|>system<|end_header_id|>"
         self._system_prompt+= f"{system_prompt}<|eot_id|>"
 
+        self._template = template
+
     @staticmethod
-    def get_user_prompt(question:str):
+    def get_user_prompt(question:str, template:Callable[[str], str]):
         prompt = f"<|start_header_id|>user<|end_header_id|>"
+
+        if template:
+            question = template(question)
+
         prompt += f"{question}<|eot_id|>"
         return prompt
 
@@ -40,6 +47,9 @@ class PromptManager:
 
         return prompt
 
+    def set_template(self, template:Callable[[str],str]):
+        self._template = template
+
     def get_prompt(self, question:str, chat_history:History=None, history_k=2) -> str:
         prompt = f"{self._system_prompt}"
 
@@ -47,12 +57,11 @@ class PromptManager:
             for h in chat_history.get_chat_history(last=history_k):
                 hq = h['q']; ha = h['a']
 
-                prompt += self.get_user_prompt(question=hq)
+                prompt += self.get_user_prompt(question=hq, template=self._template)
                 prompt += self.get_assistant_prompt(answer=ha)
 
-        prompt += self.get_user_prompt(question=question)
+        prompt += self.get_user_prompt(question=question, template=self._template)
         prompt += self.get_assistant_prompt()
-
+        
         return prompt
-
 
