@@ -1,10 +1,9 @@
 
-from llama_synth import LlamaModerator, LlamaSpeaker
-from llama_synth.moderator import Topic
-from llama_synth.prompt import Prompt
-
-
 def interview_example():
+    from llama_synth import LlamaModerator, LlamaSpeaker
+    from llama_synth.moderator import Topic
+    from llama_synth.prompt import Prompt
+
     agent1 = LlamaSpeaker.from_card("./cards/sheldon.yaml")
     agent2 = LlamaSpeaker.from_card("./cards/harry.yaml")
 
@@ -32,6 +31,10 @@ def interview_example():
     moderator.interview(assistant=assistent, n=2)
 
 def relay_example():
+    from llama_synth import LlamaModerator, LlamaSpeaker
+    from llama_synth.moderator import Topic
+
+
     agent1 = LlamaSpeaker.from_card("./cards/sheldon.yaml")
     agent2 = LlamaSpeaker.from_card("./cards/harry.yaml")
 
@@ -47,7 +50,7 @@ def relay_example():
     moderator.add_agent(agent1)
     moderator.add_agent(agent2)
 
-    moderator.relay(n=5, n_toss=10)
+    moderator.relay(n=1, n_toss=4)
 
 def classify_label():
     from llama_synth import LlamaSpeaker
@@ -77,5 +80,5 @@ def classify_label():
 
 if __name__ == '__main__':
     # classify_label()
-    # relay_example()
-    interview_example()
+    relay_example()
+    # interview_example()

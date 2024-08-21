@@ -73,7 +73,7 @@ class LlamaModerator:
                 inp = answer
             
             print(f"RING RING 🔔🔔")
-            [agent.prompt.history.clear_history() for agent in self._agent_pool]
+            [agent.prompt.history.clear() for agent in self._agent_pool]
 
     def interview(self, assistant:LlamaSpeaker, n:int=5) -> None: 
         get_q = self._topic.get_question_getter()
