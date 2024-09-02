@@ -1,10 +1,11 @@
-from typing import Callable, List
+from typing import Callable, List, NewType
 
-type TemplateGetter = Callable[[str], str]
+TemplateGetter = NewType("TemplateGetter", Callable[[str], str])
 
 def get_classification_template(label_names:List[str]) -> TemplateGetter:
     def template(inp:str) -> str:
-        prompt = f"Classify the Input into {", ".join(label_names)}\n"
+        labels = ", ".join(label_names)
+        prompt = f"Classify the Input into {labels}\n"
         prompt += f"Input:{inp}\n"
         prompt += f"Label:"
         return prompt

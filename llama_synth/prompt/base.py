@@ -1,10 +1,10 @@
-from typing import Callable, List
+from typing import Callable, List, NewType
 
 from .template import get_classification_template
 
 import yaml
 
-type TemplateGetter = Callable[[str], str]
+TemplateGetter = NewType("TemplateGetter", Callable[[str], str])
 
 class History:
     def __init__(self, max_history=50) -> None:

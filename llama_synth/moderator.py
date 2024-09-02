@@ -1,10 +1,10 @@
-from typing import List, Callable, Optional
+from typing import List, Callable, NewType
 
 from . import LlamaSpeaker
 
 import random
 
-type QuestionGetter = Callable[[], str]
+QuestionGetter = NewType("QuestionGetter",  Callable[[], str])
 
 class Topic:
     def __init__(self, question, topic_list:List[str]=[]) -> None:
